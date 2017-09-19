@@ -5,9 +5,10 @@ deviceConfig:
         privateKeyPath: <Your-private.pem.key path>
         rootCaPath: <Your-rootCA.crt path>
         thing: <Serial-number>
+        certID: <Your certificate ID>
 
 topicConfig:
-        data: <Serial-number>/data
+        userdata: <Serial-number>/userdata
         analysis: <Serial-number>/analysis
         present: <Serial-number>/present
         controlOn: <Serial-number>/control/on
