@@ -7,8 +7,8 @@ require 'date'
 require 'yaml'
 
 class SwitchIoTDevice_OFF
+  attr_accessor :signal, :shadowStatus
   def initialize(path, address = 0x27)
-    attr_accessor :signal
     #AWSIoT Read yaml - Common settings
     awsIoTconfig = YAML.load_file("rbDeviceConfig.yml")
     @host = awsIoTconfig["deviceConfig"]["host"]
