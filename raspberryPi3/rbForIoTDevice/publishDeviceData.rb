@@ -24,9 +24,9 @@ class AwsIoTDevice
     @device = I2C.create(path)
     @address = address
 
-    @temp = 0
-    @humidity = 0
-    @timeStamp = 0
+    @temp = 30 #0
+    @humidity = 40 #0
+    @timeStamp = 500 #0
   end
 
   #fetch Humidity & Temperature with i2c device
@@ -38,12 +38,12 @@ class AwsIoTDevice
     hum_h = hum_h & 0x3f
     hum = (hum_h << 8) | hum_l
     temp = ((temp_h << 8) | temp_l) / 4
-=begin
+
     @temp = temp * 1.007e-2 - 40.0
     @humidity = hum * 6.10e-3
     @timeStamp = Time.now.to_i
-=end
-    deviceData = JSON.generate({"time" => @time, "temp" => @temp})
+
+    deviceData = JSON.generate({"uuid" => @thing, "timeStamp" => @timeStamp})
     return deviceData
   end #def fetch_humidity_temperature end
 
