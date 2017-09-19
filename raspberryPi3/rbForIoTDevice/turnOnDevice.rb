@@ -42,8 +42,8 @@ class SwitchIoTDevice_ON
 
   #send signal to Air confitionar
   def sendSignal
-    on = system("bto_advanced_USBIR_cmd -d #{@signal}")
-    if on
+    signal = system("bto_advanced_USBIR_cmd -d #{@signal}")
+    if signal
       puts "sended signal to device"
     end
   end #def sendSignal end
@@ -63,7 +63,7 @@ Process.daemon(nochdir = true, noclose = nil)
 
 loop do
   raspberryPi3.waitOnPublish
-  raspberryPi3.signal = File.read("turnOn.txt")
+  raspberryPi3.signal = File.read("turnOn_btoAdvanced.txt")
   raspberryPi3.sendSignal
 
   raspberryPi3.shadowStatus = 1 #Turn ON
