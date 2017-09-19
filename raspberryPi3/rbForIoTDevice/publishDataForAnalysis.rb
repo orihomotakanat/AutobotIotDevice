@@ -46,6 +46,7 @@ class AwsIoTRuleToKinesis
     @humidity = hum * 6.10e-3
     @timeStamp = Time.now.to_i
 
+    #** setした温度に達したら自動的にshadow -> 0になる機能は削除 **
     tuple = JSON.generate({"uuid" => @thing, "certid" => @certid, "timeFromDevice" => @timeStamp, "roomTemperature" => @temperature, "roomHumidity" => @humidity, "shadow" => @shadow})
     return tuple
   end #def fetch_humidity_temperature end
@@ -55,8 +56,8 @@ class AwsIoTRuleToKinesis
     MQTT::Client.connect(host:@host, port:@port, ssl: true, cert_file:@certificate_path, key_file:@private_key_path, ca_file: @root_ca_path) do |client|
       client.subscribe(@topic) #subscribe message of airconmode
       topic, @shadow = client.get
-      puts topic
-      puts @shadow
+      #puts topic #published topic thingName/analysis
+      puts @shadow #published message
     end #MQTT end
   end #def shadowStatus end
 
