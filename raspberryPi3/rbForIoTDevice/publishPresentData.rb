@@ -25,8 +25,8 @@ class PushTOios
     @address = address
 
     @temperature = 0
-    @humidity = 0 #0
-    @timeStamp = 0 #0
+    @humidity = 0 
+    @timeStamp = 0 
   end
 
   #fetch Humidity & Temperature with i2c device
@@ -39,8 +39,8 @@ class PushTOios
     hum = (hum_h << 8) | hum_l
     temp = ((temp_h << 8) | temp_l) / 4
 
-    @temperature = temp * 1.007e-2 - 40.0
-    @humidity = hum * 6.10e-3
+    @temperature = (temp * 1.007e-2 - 40.0).round(2)
+    @humidity = (hum * 6.10e-3).round(2)
     @timeStamp = Time.now.to_i
 
     presentData = JSON.generate({"currentTemperature" => @temperature, "currentHumidity" => @humidity})
@@ -63,6 +63,6 @@ raspberryPi3 = PushTOios.new('/dev/i2c-1')
 
 loop do
   puts raspberryPi3.fetch_present_humidity_temperature
-  //raspberryPi3.publishPresentData
-  //sleep(30)
+  raspberryPi3.publishPresentData
+  sleep(30)
 end
