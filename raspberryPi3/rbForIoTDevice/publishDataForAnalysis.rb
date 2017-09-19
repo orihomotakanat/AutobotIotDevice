@@ -17,6 +17,7 @@ class AwsIoTRuleToKinesis
     @private_key_path = awsIoTconfig["deviceConfig"]["privateKeyPath"]
     @root_ca_path = awsIoTconfig["deviceConfig"]["rootCaPath"]
     @thing = awsIoTconfig["deviceConfig"]["thing"]
+    @certid = awsIoTconfig["deviceConfig"]["certID"]
 
     #Independent settings
     @topic = awsIoTconfig["topicConfig"]["analysis"]
@@ -25,6 +26,7 @@ class AwsIoTRuleToKinesis
     @device = I2C.create(path)
     @address = address
 
+    @shadow = shadow #TunrnedOnAircon -> 1, TurnedOffAircon -> 0
     @temperature = 0
     @humidity = 0
     @timeStamp = 0
@@ -44,13 +46,23 @@ class AwsIoTRuleToKinesis
     @humidity = hum * 6.10e-3
     @timeStamp = Time.now.to_i
 
-    tuple = JSON.generate({"roomTemperature" => @temperature, "roomHumidity" => @humidity, "uuid" => @thing, "timeFromDevice" => @timeStamp, "shadow" => @shadow})
+    tuple = JSON.generate({"uuid" => @thing, "certid" => @certid, "timeFromDevice" => @timeStamp, "roomTemperature" => @temperature, "roomHumidity" => @humidity, "shadow" => @shadow})
     return tuple
   end #def fetch_humidity_temperature end
 
+  #shadowStatusGetter
+  def shadowStatus
+    MQTT::Client.connect(host:@host, port:@port, ssl: true, cert_file:@certificate_path, key_file:@private_key_path, ca_file: @root_ca_path) do |client|
+      client.subscribe(@topic) #subscribe message of airconmode
+      topic, @shadow = client.get
+      puts topic
+      puts @shadow
+    end #MQTT end
+  end #def shadowStatus end
+
   #Publish device data to AWSIoT
-  def publishPresentData
-    payload = fetch_present_humidity_temperature
+  def publishToKinesis
+    payload = fetchDeviceData
     MQTT::Client.connect(host:@host, port: @port, ssl: true, cert_file:@certificate_path, key_file:@private_key_path, ca_file: @root_ca_path) do |client|
       client.publish(@topic, payload)
     end
@@ -60,10 +72,16 @@ end #class AwsIoTDevice
 #Following are processed codes
 raspberryPi3 = AwsIoTRuleToKinesis.new('/dev/i2c-1')
 
-#Process.daemon #Become daemon process
+#Process.daemon(nochdir = true, noclose = nil) #Become daemon process
 
 loop do
-  puts raspberryPi3.fetchDeviceData
-  raspberryPi3.publishPresentData
-  sleep(30)
+  begin
+  Timeout.timeout(3) do #wait 3 sec and if timeouts -> call rescue
+      raspberryPi3.shadowStatus
+      puts "Received shadow status" + raspberryPi3.shadowStatus
+  end
+  rescue Timeout::Error
+    puts "fetch device" + raspberryPi3.fetchDeviceData
+  end
+  #raspberryPi3.publishToKinesis
 end
