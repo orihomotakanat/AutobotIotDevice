@@ -6,7 +6,7 @@ require 'pp'
 require 'date'
 require 'yaml'
 
-class SwitchIoTDevice_ON
+class SwitchIoTDevice_OFF
   def initialize(path, address = 0x27)
     attr_accessor :signal
     #AWSIoT Read yaml - Common settings
@@ -19,7 +19,7 @@ class SwitchIoTDevice_ON
     @thing = awsIoTconfig["deviceConfig"]["thing"]
 
     #Independent settings
-    @topic = awsIoTconfig["topicConfig"]["controlOn"]
+    @topic = awsIoTconfig["topicConfig"]["controlOff"]
     @updateShadowTopic = awsIoTconfig["topicConfig"]["analysis"]
     @shadowStatus = 0
 
@@ -35,7 +35,7 @@ class SwitchIoTDevice_ON
   def waitOnPublish
     MQTT::Client.connect(host:@host, port:@port, ssl: true, cert_file:@certificate_path, key_file:@private_key_path, ca_file: @root_ca_path) do |client|
       puts "waiting publish from other device"
-      client.subscribe(@topic) #thingName/control/on
+      client.subscribe(@topic) #thingName/control/off
       client.get #wait ios-app's publish
     end #MQTT end
   end
@@ -57,16 +57,16 @@ class SwitchIoTDevice_ON
 end #class AwsIoTDevice
 
 #Following are processed codes
-raspberryPi3 = SwitchIoTDevice_ON.new('/dev/i2c-1')
+raspberryPi3 = SwitchIoTDevice_OFF.new('/dev/i2c-1')
 
 #Process.daemon(nochdir = true, noclose = nil)
 
 loop do
   raspberryPi3.waitOnPublish
-  raspberryPi3.signal = File.read("turnOn_btoAdvanced.txt")
+  raspberryPi3.signal = File.read("turnOff_btoAdvanced.txt")
   raspberryPi3.sendSignal
 
-  raspberryPi3.shadowStatus = 1 #Turn ON
+  raspberryPi3.shadowStatus = 0 #Turn OFF
   raspberryPi3.updateShadow
   sleep(2)
   raspberryPi3.updateShadow #re-send
