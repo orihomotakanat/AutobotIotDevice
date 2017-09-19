@@ -77,12 +77,12 @@ raspberryPi3 = AwsIoTRuleToKinesis.new('/dev/i2c-1')
 
 loop do
   begin
-  Timeout.timeout(3) do #wait 3 sec and if timeouts -> call rescue
+  Timeout.timeout(5) do #wait 5 sec and if timeouts -> call rescue
       raspberryPi3.shadowStatus
       puts "Received shadow status" + raspberryPi3.shadowStatus
   end
   rescue Timeout::Error
     puts "fetch device" + raspberryPi3.fetchDeviceData
   end
-  #raspberryPi3.publishToKinesis
+  raspberryPi3.publishToKinesis
 end
