@@ -59,7 +59,7 @@ end #class AwsIoTDevice
 #Following are processed codes
 raspberryPi3 = PushTOios.new('/dev/i2c-1')
 
-#Process.daemon #Become daemon process
+Process.daemon #Become daemon process
 
 loop do
   puts raspberryPi3.fetch_present_humidity_temperature
