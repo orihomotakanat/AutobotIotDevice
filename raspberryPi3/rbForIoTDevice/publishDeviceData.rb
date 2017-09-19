@@ -25,8 +25,8 @@ class AwsIoTDevice
     @address = address
 
     @temperature = 0
-    @humidity = 0 #0
-    @timeStamp = 0 #0
+    @humidity = 0
+    @timeStamp = 0
   end
 
   #fetch Humidity & Temperature with i2c device
