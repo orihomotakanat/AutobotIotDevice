@@ -51,7 +51,7 @@ class SwitchIoTDevice_ON
   #shadowUpdate on = 1, off = 0
   def updateShadow
     MQTT::Client.connect(host:@host, port: @port, ssl: true, cert_file:@certificate_path, key_file:@private_key_path, ca_file: @root_ca_path) do |client|
-      client.publish(@topic, @shadowStatus)
+      client.publish(@updateShadowTopic, @shadowStatus)
     end
   end
 end #class AwsIoTDevice
