@@ -18,15 +18,15 @@ class AwsIoTDevice
     @thing = awsIoTconfig["deviceConfig"]["thing"]
 
     #Independent settings
-    @topic = awsIoTconfig["topicConfig"]["data"]
+    @topic = awsIoTconfig["topicConfig"]["userdata"]
 
     #i2c settings
     @device = I2C.create(path)
     @address = address
 
-    @temp = 30 #0
-    @humidity = 40 #0
-    @timeStamp = 500 #0
+    @temperature = 0
+    @humidity = 0 #0
+    @timeStamp = 0 #0
   end
 
   #fetch Humidity & Temperature with i2c device
@@ -39,11 +39,11 @@ class AwsIoTDevice
     hum = (hum_h << 8) | hum_l
     temp = ((temp_h << 8) | temp_l) / 4
 
-    @temp = temp * 1.007e-2 - 40.0
+    @temperature = temp * 1.007e-2 - 40.0
     @humidity = hum * 6.10e-3
     @timeStamp = Time.now.to_i
 
-    deviceData = JSON.generate({"uuid" => @thing, "timeStamp" => @timeStamp})
+    deviceData = JSON.generate({"uuid" => @thing, "timeStamp" => @timeStamp, "data" => {"roomHumidity" => @humidity, "roomTemperature" => @temperature}})
     return deviceData
   end #def fetch_humidity_temperature end
 
