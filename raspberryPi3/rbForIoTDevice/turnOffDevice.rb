@@ -59,7 +59,7 @@ end #class AwsIoTDevice
 #Following are processed codes
 raspberryPi3 = SwitchIoTDevice_OFF.new('/dev/i2c-1')
 
-#Process.daemon(nochdir = true, noclose = nil)
+Process.daemon(nochdir = true, noclose = nil)
 
 loop do
   raspberryPi3.waitOnPublish

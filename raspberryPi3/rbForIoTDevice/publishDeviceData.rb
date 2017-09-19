@@ -59,10 +59,10 @@ end #class AwsIoTDevice
 #Following are processed codes
 raspberryPi3 = AwsIoTDevice.new('/dev/i2c-1')
 
-#Process.daemon #Become daemon process
+Process.daemon #Become daemon process
 
 loop do
   puts raspberryPi3.fetch_humidity_temperature
   raspberryPi3.publishDeviceData
-  sleep(3)#(180)
+  sleep(120)#(180)
 end

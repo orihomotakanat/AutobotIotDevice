@@ -73,7 +73,7 @@ end #class AwsIoTDevice
 #Following are processed codes
 raspberryPi3 = AwsIoTRuleToKinesis.new('/dev/i2c-1')
 
-#Process.daemon(nochdir = true, noclose = nil) #Become daemon process
+Process.daemon(nochdir = true, noclose = nil) #Become daemon process
 
 loop do
   begin
