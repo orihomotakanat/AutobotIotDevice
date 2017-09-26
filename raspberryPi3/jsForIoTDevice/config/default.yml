@@ -1,0 +1,15 @@
+deviceConfig:
+        host: <AWSIoT-Endopoint (e.g.) a1arvj4dhixpps.iot.us-east-1.amazonaws.com>
+        port: 8883
+        certificatePath: <Your-certificate.pem.crt path (e.g.) ~/.ssh/Your-certificate.pem.crt >
+        privateKeyPath: <Your-private.pem.key path>
+        rootCaPath: <Your-rootCA.crt path>
+        thing: <Serial-number>
+        certID: <Your certificate ID>
+
+topicConfig:
+        userdata: <Serial-number>/userdata
+        analysis: <Serial-number>/analysis
+        present: <Serial-number>/present
+        controlOn: <Serial-number>/control/on
+        controlOff: <Serial-number>/control/off
