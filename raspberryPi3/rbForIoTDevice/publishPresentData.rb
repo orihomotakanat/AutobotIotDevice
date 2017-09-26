@@ -64,5 +64,5 @@ Process.daemon #Become daemon process
 loop do
   puts raspberryPi3.fetch_present_humidity_temperature
   raspberryPi3.publishPresentData
-  sleep(30)
+  sleep(5)
 end
