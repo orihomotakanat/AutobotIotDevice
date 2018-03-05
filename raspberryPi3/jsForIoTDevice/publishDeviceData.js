@@ -9,6 +9,7 @@ var device = awsIot.device({
     caPath: awsIoTconfig.deviceConfig.rootCaPath,
     clientId: awsIoTconfig.deviceConfig.thing,
     host: awsIoTconfig.deviceConfig.host
+    debug: true
 });
 
 var topic = awsIoTconfig.topicConfig.userdata
@@ -16,6 +17,6 @@ var topic = awsIoTconfig.topicConfig.userdata
 device.on('connect', function() {
     console.log('connect');
     setInterval( function() {
-        device.publish(topic, "--temperature&humidity--");
-    }, 1);
+        device.publish(topic, JSON.stringify({ message: "Hello World"}));
+    }, 1000); //per 1sec
 });
