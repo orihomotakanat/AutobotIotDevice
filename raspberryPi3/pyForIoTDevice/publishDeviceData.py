@@ -6,6 +6,7 @@ import yaml
 import json
 import datetime
 import calendar
+import smbus
 
 # General message notification callback
 def customOnMessage(message):
@@ -31,7 +32,24 @@ def customPubackCallback(mid):
     print(mid)
     print("++++++++++++++\n\n")
 
+# Fetch temperature & humidity
+def fetchTemperature(): # For HIH6130sensor
+    i2c = smbus.SMBus(1)
+    buf = i2c.read_i2c_block_data(0x27, 0, 4)
 
+    status = buf[0] >> 6 & 0x03 # get status
+
+    # Digital output
+    humidity_digit = (buf[0] & 0x3F) * 256 + buf[1]
+    temperature_digit = buf[2] * 64 + (buf[3] >> 2)
+
+    # Convert output
+    humidity = round(humidity_digit / 16383.0 * 100, 8)
+    temperature = round(temperature_digit / 16383.0 * 165 - 40, 8)
+
+    return temperature, humidity
+
+# Read configure
 with open('pyDeviceConfig.yml') as file:
     config = yaml.load(file)
 
@@ -80,10 +98,6 @@ myAWSIoTMQTTClient.connect()
 myAWSIoTMQTTClient.subscribeAsync(topic, 1, ackCallback=customSubackCallback)
 time.sleep(2)
 
-# test configure
-humidity = "50"
-temperature = "20"
-
 # Publish to the same topic in a loop forever
 while True:
     # timestamp
@@ -92,6 +106,7 @@ while True:
     timeStamp = str(calendar.timegm(now.utctimetuple()))
 
     # publish
-    publishPayload = json.dumps({"recordat": recordat, "time_stamp": timeStamp, "uuid": clientId,  "room_humidity": humidity, "room_temperature": temperature})
+    output = fetchTemperature() # output[0] = temperature, output[1] = humidity
+    publishPayload = json.dumps({"recordat": recordat, "time_stamp": timeStamp, "uuid": clientId,  "room_humidity": output[1], "room_temperature": output[0]})
     myAWSIoTMQTTClient.publishAsync(topic, publishPayload, 1, ackCallback=customPubackCallback)
     time.sleep(1)
