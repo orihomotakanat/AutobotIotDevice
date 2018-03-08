@@ -39,8 +39,8 @@ host = config['deviceConfig']['host']
 rootca = config['deviceConfig']['rootCaPath']
 clientcert = config['deviceConfig']['certificatePath']
 clientkey = config['deviceConfig']['privateKeyPath']
-clientId = config['deviceConfig']['clientid']
-topic = config['topicConfig']['test']
+clientId = config['deviceConfig']['clientId']
+topic = config['topicConfig']['testtopic']
 
 # For confirmation of each path
 print("Endpoint: " + host + "\n" \
