@@ -13,3 +13,4 @@ topicConfig:
         present: <Serial-number>/present
         controlOn: <Serial-number>/control/on
         controlOff: <Serial-number>/control/off
+        testtopic: <Serial-number>/test

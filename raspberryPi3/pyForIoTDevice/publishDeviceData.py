@@ -4,6 +4,8 @@ import time
 import argparse
 import yaml
 import json
+import datetime
+import calendar
 
 # General message notification callback
 def customOnMessage(message):
@@ -30,12 +32,23 @@ def customPubackCallback(mid):
     print("++++++++++++++\n\n")
 
 
-host = yaml(host)
-rootca = yaml()
-clientcert
-clientkey
-# clientId
-topic
+with open('pyDeviceConfig.yml') as file:
+    config = yaml.load(file)
+
+host = config['deviceConfig']['host']
+rootca = config['deviceConfig']['rootCaPath']
+clientcert = config['deviceConfig']['certificatePath']
+clientkey = config['deviceConfig']['privateKeyPath']
+clientId = config['deviceConfig']['clientid']
+topic = config['topicConfig']['test']
+
+# For confirmation of each path
+print("Endpoint: " + host + "\n" \
+        "RootCA path: " + rootca + "\n" \
+        "clientcert path: " + clientcert + "\n" \
+        "clientkey path: " + clientkey + "\n" \
+        "clientId: " + clientId + "\n" \
+        "topic: " + topic + "\n")
 
 
 # Configure logging
@@ -51,7 +64,7 @@ logger.addHandler(streamHandler)
 myAWSIoTMQTTClient = None
 myAWSIoTMQTTClient = AWSIoTMQTTClient(clientId)
 myAWSIoTMQTTClient.configureEndpoint(host, 8883)
-myAWSIoTMQTTClient.configureCredentials(rootca, clientcert, clientkey)
+myAWSIoTMQTTClient.configureCredentials(rootca, clientkey, clientcert)
 
 # AWSIoTMQTTClient connection configuration
 myAWSIoTMQTTClient.configureAutoReconnectBackoffTime(1, 32, 20)
@@ -67,8 +80,18 @@ myAWSIoTMQTTClient.connect()
 myAWSIoTMQTTClient.subscribeAsync(topic, 1, ackCallback=customSubackCallback)
 time.sleep(2)
 
+# test configure
+humidity = "50"
+temperature = "20"
+
 # Publish to the same topic in a loop forever
 while True:
-    publishPayload = json.dumps({"recordat" => recordat, "time_stamp" => timeStamp, "uuid" => clientId,  "room_humidity" => humidity, "room_temperature" => temperature})
+    # timestamp
+    now = datetime.datetime.utcnow()
+    recordat = str(now.strftime("%Y-%m-%d"))
+    timeStamp = str(calendar.timegm(now.utctimetuple()))
+
+    # publish
+    publishPayload = json.dumps({"recordat": recordat, "time_stamp": timeStamp, "uuid": clientId,  "room_humidity": humidity, "room_temperature": temperature})
     myAWSIoTMQTTClient.publishAsync(topic, publishPayload, 1, ackCallback=customPubackCallback)
     time.sleep(1)
