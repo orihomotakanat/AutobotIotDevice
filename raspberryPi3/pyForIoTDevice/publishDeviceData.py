@@ -7,6 +7,7 @@ import json
 import datetime
 import calendar
 import smbus
+from collections import OrderedDict
 
 # General message notification callback
 def customOnMessage(message):
@@ -103,10 +104,14 @@ while True:
     # timestamp
     now = datetime.datetime.utcnow()
     recordat = str(now.strftime("%Y-%m-%d"))
-    timeStamp = str(calendar.timegm(now.utctimetuple()))
+    timeStamp = calendar.timegm(now.utctimetuple())
+    
+    # Temperature & Humidity
+    output = fetchTemperature() # output[0] = temperature, output[1] = humidity
+    temperature = output[0]
+    humidity = output[1]
 
     # publish
-    output = fetchTemperature() # output[0] = temperature, output[1] = humidity
-    publishPayload = json.dumps({"recordat": recordat, "time_stamp": timeStamp, "uuid": clientId,  "room_humidity": output[1], "room_temperature": output[0]})
+    publishPayload = json.dumps(OrderedDict([("recordat", recordat), ("time_stamp", timeStamp), ("uuid", clientId), ("room_humidity", output[1]), ("room_temperature", output[0])]))
     myAWSIoTMQTTClient.publishAsync(topic, publishPayload, 1, ackCallback=customPubackCallback)
     time.sleep(1)
